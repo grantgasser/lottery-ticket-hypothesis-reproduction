@@ -4,9 +4,10 @@ This is an attempt to reproduce the [Lottery Ticket Hypothesis paper](https://ar
 ## Project Proposal
 
 ### Literature & Codebase Search
+....
 
 ### Paper Review
 Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifying-independently-reproducible-machine-learning-research.pdf)
 
 ### Proposed Timeline (w/ weekly milestone)
-
+....
