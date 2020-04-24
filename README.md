@@ -1,13 +1,14 @@
 # Reproducing Lottery Ticket Hypothesis Paper
 This is an attempt to reproduce the [Lottery Ticket Hypothesis paper](https://arxiv.org/abs/1803.03635) by Frankle and Carbin. 
 
-
-### Basic Summary 
+## Basic Summary 
 This paper in a few words: 1) Train network 2) Prune unecessary weights/connections. It would be great to figure out how to identify the subnetwork without having to build and train full network. This pruning method can reduce the number of parameters by 10x while maintaining the same performance. See [this article](https://www.technologyreview.com/2019/05/10/135426/a-new-way-to-build-tiny-neural-networks-could-create-powerful-ai-on-your-phone/) for more. 
 
 ## Project Proposal
 
 ### Literature Search
+
+### Cited Work
 
 ### Follow Up Work
 * [Sparse Transfer Learning](https://paperswithcode.com/paper/sparse-transfer-learning-via-winning-lottery) from Princeton researcher with [code](https://github.com/rahulsmehta/sparsity-experiments)
@@ -43,6 +44,17 @@ Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifyin
 * Paper Topic: Experimental Results
 * Intimidating: No
 
-### Proposed Timeline (w/ weekly milestone)
+### Tools
+* [Paperspace GPUs](https://gradient.paperspace.com/free-gpu)
+* Try to use [PyTorch](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html) for pruning. If it doesn't work, implement ourselves. 
 
+### Reproduction Advice
+* cant prune every layer equally. keep track of that stuff
+* learning rate matters for the bigger models but not as much for the smaller models
+* be careful using pytorch in-built pruning
 
+### Tentative Proposed Timeline (w/ weekly milestone)
+* Week 1: Reproduce MNIST 97-98% in PyTorch
+* Week 2: Reproduce Figure 1 from paper
+* Week 4: Reproduce Section 2: Winning Tickets in Fully-Connected Networks
+* Week 6-7: Reproduce Section 3: Winning Tickets in Convolutional Networks
