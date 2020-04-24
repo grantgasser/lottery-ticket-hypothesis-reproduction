@@ -22,7 +22,27 @@ This paper in a few words: 1) Train network 2) Prune unecessary weights/connecti
 ### Paper Review
 Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifying-independently-reproducible-machine-learning-research.pdf)
 
+#### Mildly Subjective
+* Number of Tables: 1
+* Number of Graphs/Plots: 25 (paper), 131 (appendix)
+* Number of Equations: 7
+* Proofs: 0
+* Exact Compute Specified: NOT SPECIFIED
+* Hyperparameters: Figure 2
+* Compute Needed
+* Data Available: CIFAR and MNIST
+* Pseudo Code: Level 2 ("Step-Code", high level)
+
+#### Subjective
+* Number of Conceptualization Figures: 0
+* Uses Exemplar Toy Problem: No
+* Number of Other Figures: 0
+* Rigor vs Empirical: Empirical
+* Paper Readability: Good
+* Algorithm Difficulty: Medium
+* Paper Topic: Experimental Results
+* Intimidating: No
+
 ### Proposed Timeline (w/ weekly milestone)
-....
 
 
