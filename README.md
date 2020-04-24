@@ -11,8 +11,8 @@ This paper in a few words: 1) Train network 2) Prune unecessary weights/connecti
 ### Cited Work
 
 ### Follow Up Work
-* [Sparse Transfer Learning](https://paperswithcode.com/paper/sparse-transfer-learning-via-winning-lottery) from Princeton researcher with [code](https://github.com/rahulsmehta/sparsity-experiments)
-* [Uber paper](https://eng.uber.com/deconstructing-lottery-tickets/) with this [code](https://github.com/uber-research/deconstructing-lottery-tickets)
+* [Sparse Transfer Learning](https://paperswithcode.com/paper/sparse-transfer-learning-via-winning-lottery) with [code](https://github.com/rahulsmehta/sparsity-experiments)
+* [Deconstructing Lottery Tickets - Uber](https://eng.uber.com/deconstructing-lottery-tickets/) with [code](https://github.com/uber-research/deconstructing-lottery-tickets)
 
 ### Codebase Search
 * [Re-implementation](https://github.com/google-research/lottery-ticket-hypothesis) by original author at Google
@@ -49,9 +49,9 @@ Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifyin
 * Try to use [PyTorch](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html) for pruning. If it doesn't work, implement ourselves. 
 
 ### Reproduction Advice
-* cant prune every layer equally. keep track of that stuff
-* learning rate matters for the bigger models but not as much for the smaller models
-* be careful using pytorch in-built pruning
+* Can't prune every layer equally, keep track of that stuff
+* Learning rate matters for the bigger models but not as much for the smaller models
+* Be careful using pytorch in-built pruning
 
 ### Tentative Proposed Timeline (w/ weekly milestone)
 * Week 1: Reproduce MNIST 97-98% in PyTorch
