@@ -6,11 +6,9 @@ This paper in a few words: 1) Train network 2) Prune unecessary weights/connecti
 
 ## Project Proposal
 
-### Literature Search
+### Cited Literature
 
-### Cited Work
-
-### Follow Up Work
+### Follow Up Literature
 * [Sparse Transfer Learning](https://paperswithcode.com/paper/sparse-transfer-learning-via-winning-lottery) with [code](https://github.com/rahulsmehta/sparsity-experiments)
 * [Deconstructing Lottery Tickets - Uber](https://eng.uber.com/deconstructing-lottery-tickets/) with [code](https://github.com/uber-research/deconstructing-lottery-tickets)
 
