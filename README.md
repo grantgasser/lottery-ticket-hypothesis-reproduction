@@ -28,8 +28,8 @@ Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifyin
 * Number of Equations: 7
 * Proofs: 0
 * Exact Compute Specified: NOT SPECIFIED
-* Hyperparameters: Figure 2
-* Compute Needed
+* Hyperparameters: ![Figure 2](lottery_ticket_hyperparameters.png) 
+* Compute Needed: NOT SPECIFIED
 * Data Available: CIFAR and MNIST
 * Pseudo Code: Level 2 ("Step-Code", high level)
 
