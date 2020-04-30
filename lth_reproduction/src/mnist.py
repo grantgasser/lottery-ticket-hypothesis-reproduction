@@ -16,12 +16,19 @@ class LeNet(nn.Module):
     """
     LeNet Architecture
     
-    TODO: Verify that this LeNet corrlates well enough with the net used in LTH
+    TODO: Verify that this LeNet correlates well enough with the net used in LTH
+
+    # input: torch.Size([64, 1, 28, 28])
+    # 32*32*3*3 = 9216
     """
     def __init__(self):
         super(LeNet, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, 1)
-        self.conv2 = nn.Conv2d(32, 64, 3, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 1) # input channel size must be same as previous out_channel
+        # is out_channels the number of kernels?
+        # self.conv1 = nn.Conv2d(in_channels=1, out_channels=28, kernel_size=3, stride=1)
+        # self.pool1 = F.max_pool2d(kernel_size= 2)
+        # self.conv2 = nn.Conv2d(in_channels=6, out_channels=14, kernel_size=)
 
         # From LTH: FC Layers 300, 100, 10
         self.fc1 = nn.Linear(9216, 300)
@@ -107,8 +114,11 @@ def main(batch_size=64, test_batch_size=1000, epochs=14, lr=1.0, gamma=0.7,
         batch_size=test_batch_size, shuffle=True, **kwargs)
 
     model = LeNet().to(device)
-    optimizer = optim.Adadelta(model.parameters(), lr=lr)
+    # NOTE: Interesting: Adam w/ lr=1.0 did not converge
+    # Adadelta w/ lr=1.0 did converge
+    optimizer = optim.Adam(model.parameters(), lr=lr)
 
+    # did the LTH authors use a LR scheduler?
     scheduler = StepLR(optimizer, step_size=1, gamma=gamma)
     for epoch in range(1, epochs + 1):
         train(model, device, train_loader, optimizer, epoch)
@@ -120,5 +130,6 @@ def main(batch_size=64, test_batch_size=1000, epochs=14, lr=1.0, gamma=0.7,
 
 
 if __name__ == '__main__':
+    gin.parse_config_file('mnist-config.gin')
     main()
 

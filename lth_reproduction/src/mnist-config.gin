@@ -1,10 +1,7 @@
-"""
-Hyperparams for MNIST LeNet
-"""
 main.batch_size = 64
 main.test_batch_size = 1000
-main.epochs = 5
-main.lr = 1.0
+main.epochs = 2
+main.lr = 1.2e-3
 main.gamma = 0.7
 main.no_cuda = False
 main.rand_seed = 1
