@@ -1,6 +1,3 @@
-"""
-MNIST Classification with LeNet
-"""
 from __future__ import print_function
 import argparse
 import torch
@@ -19,30 +16,27 @@ class LeNet(nn.Module):
     TODO: Verify that this LeNet correlates well enough with the net used in LTH
 
     # input: torch.Size([64, 1, 28, 28])
-    # 32*32*3*3 = 9216
     """
     def __init__(self):
         super(LeNet, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 3, 1)
-        self.conv2 = nn.Conv2d(32, 64, 3, 1) # input channel size must be same as previous out_channel
-        # is out_channels the number of kernels?
-        # self.conv1 = nn.Conv2d(in_channels=1, out_channels=28, kernel_size=3, stride=1)
-        # self.pool1 = F.max_pool2d(kernel_size= 2)
-        # self.conv2 = nn.Conv2d(in_channels=6, out_channels=14, kernel_size=)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=6, kernel_size=(5, 5))
+        self.pool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=2)
+        self.conv2 = nn.Conv2d(in_channels=6, out_channels=16, kernel_size=(5, 5))
 
         # From LTH: FC Layers 300, 100, 10
-        self.fc1 = nn.Linear(9216, 300)
+        self.fc1 = nn.Linear(16*4*4, 300)
         self.fc2 = nn.Linear(300, 100)
         self.fc3 = nn.Linear(100, 10)
 
     def forward(self, x):
     	# Convolutions
-        x = self.conv1(x)
+        x = self.conv1(x)  # torch.Size([64, 6, 24, 24])
         x = F.relu(x)
-        x = self.conv2(x)
+        x = self.pool1(x)  # torch.Size([64, 6, 12, 12])
+        x = self.conv2(x)  # torch.Size([64, 16, 8, 8])
         x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-        x = torch.flatten(x, 1)
+        x = self.pool1(x)  # torch.Size([64, 16, 4, 4])
+        x = torch.flatten(x, 1)  # torch.Size([64, 256])
 
         # Full connection
         x = self.fc1(x)
@@ -90,8 +84,16 @@ def test(model, device, test_loader):
 
 
 @gin.configurable
-def main(batch_size=64, test_batch_size=1000, epochs=14, lr=1.0, gamma=0.7, 
-		 no_cuda=False, rand_seed=1, save_model=False):
+def main(
+        batch_size=64,
+        test_batch_size=1000,
+        epochs=5,
+        lr=1.0,
+        gamma=0.7,
+        no_cuda=False,
+        rand_seed=1,
+        save_model=False
+        ):
     use_cuda = not no_cuda and torch.cuda.is_available()
 
     torch.manual_seed(rand_seed)
@@ -114,8 +116,6 @@ def main(batch_size=64, test_batch_size=1000, epochs=14, lr=1.0, gamma=0.7,
         batch_size=test_batch_size, shuffle=True, **kwargs)
 
     model = LeNet().to(device)
-    # NOTE: Interesting: Adam w/ lr=1.0 did not converge
-    # Adadelta w/ lr=1.0 did converge
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     # did the LTH authors use a LR scheduler?
