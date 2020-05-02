@@ -52,24 +52,31 @@ Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifyin
 * Be careful using pytorch in-built pruning
 
 ### Tentative Proposed Timeline (w/ weekly milestone)
-* Week 1: Reproduce MNIST 97-98% in PyTorch
+* Week 1: Reproduce MNIST ~98% in PyTorch
 * Week 2: Reproduce Figure 1 from paper
 * Week 4: Reproduce Section 2: Winning Tickets in Fully-Connected Networks
 * Week 6-7: Reproduce Section 3: Winning Tickets in Convolutional Networks
 
 ## LeNet Reproduction (1st milestone)
-Like the authors of the LTH paper, we attempt to achieve ~98% accuracy on the MNIST dataset with LeNet.
-We were able to achieve these results on a validation set after 2 epochs of 60K iterations: `Test set: Average loss: 0.0426, Accuracy: 9862/10000 (99%)`.
 
-Here's some details on the architecture and hyperparameters:
+### LeNet without convolutional layers
+Interestingly, the authors implemented a 300-100 LeNet architecture 
+without the convolutional layers, achieving performance around ~98%.  
+We were able to achieve these results on a validation set after 
+5 epochs of 60K iterations: `Accuracy: 9806/10000 (98.06%)`.
+
+### Architecture and Parameters
+Some details on the architecture and hyperparameters:
 * MNIST Images: `[1, 28, 28]`
-* 2 Convolutional Layers
 * 3 Fully Connected Layers
 * Batch Size: `64`
 * Optimizer: Adam
 * Learning Rate: `1.2e-3`
+* [StepLR](https://pytorch.org/docs/stable/optim.html#torch.optim.lr_scheduler.StepLR) Scheduler (not sure what the authors used)
 
-### More Details on Convolutional Architecture
+### LeNet with original convolutional layers
+* Add 2 Convolutional Layers to the architecture with max pooling.
+* Results with convolutional architecture: `Accuracy: 9912/10000 (99.12%)`
 The output dimension of a convolutional layer can be calculated like so `O = (I - K + 2P)/S + 1`, where `I`: input dim,
 `K`: kernel size, `P`: padding, and `S`: stride. The output dimension of a
 pooling layer can be calculated like so `O = (I - P)/S + 1` where `P`: size of pooling kernel. The dimensions of
@@ -77,7 +84,7 @@ the data change in the following way: `[64, 1, 28, 28] => conv1 => [64, 6, 24, 2
 => conv2 => [64, 6, 8, 8] => maxPool => [64, 6, 4, 4] => flatten => [64, 256] => fc1 => [64, 300] => fc2 => [64, 100]
 => fc3 => [64, 10]`
 
-### Interesting Note on Optimization
+#### Interesting Note on Optimization
 Adam with `lr=1.0` did not converge, though Adadelta with `lr=1.0` did converge. 
 Ultimately, we used Adam and `lr=1.2e-3.`
 
