@@ -13,6 +13,7 @@ This paper in a few words: 1) Train network 2) Prune unecessary weights/connecti
 * [Deconstructing Lottery Tickets - Uber](https://eng.uber.com/deconstructing-lottery-tickets/) with [code](https://github.com/uber-research/deconstructing-lottery-tickets)
 
 ### Codebase Search
+* [Open LTH Framework](https://github.com/facebookresearch/open_lth)
 * [Re-implementation](https://github.com/google-research/lottery-ticket-hypothesis) by original author at Google
 * [Pruning w/ PyTorch](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html)
 * [Sparse Transfer Learning code](https://github.com/rahulsmehta/sparsity-experiments)
@@ -52,12 +53,18 @@ Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifyin
 * Be careful using pytorch in-built pruning
 
 ### Tentative Proposed Timeline (w/ weekly milestone)
-* Week 1: Reproduce MNIST ~98% in PyTorch
-* Week 2: Reproduce Figure 1 from paper
-* Week 4: Reproduce Section 2: Winning Tickets in Fully-Connected Networks
-* Week 6-7: Reproduce Section 3: Winning Tickets in Convolutional Networks
+* [X] Week 1: Reproduce MNIST ~98% in PyTorch
+* [ ] Week 2: Reproduce Figure 1 from paper
+* [ ] Week 4: Reproduce Section 2: Winning Tickets in Fully-Connected Networks
+* [ ] Week 6-8: Reproduce Section 3: Winning Tickets in Convolutional Networks
 
 ## LeNet Reproduction (1st milestone)
+
+### To run (train and evaluate)
+CD into `src/` and run `python mnist_experiment.py`
+
+You can adjust parameters in `config/mnist_config.gin`. 
+Explanations of the parameters are in `experiments/mnist_experiment.py`.
 
 ### LeNet without convolutional layers
 Interestingly, the authors implemented a 300-100 LeNet architecture 
