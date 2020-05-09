@@ -4,7 +4,7 @@ main.epochs = 5
 main.lr = 1.2e-3
 main.gamma = 0.7
 main.no_cuda = False
-main.rand_seed = 1
+main.rand_seed = 42
 main.save_model = False
 main.conv_layers = True
 
