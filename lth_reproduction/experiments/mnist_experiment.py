@@ -47,6 +47,7 @@ def main(
 
     # setup device, model, optimizer, and lr scheduler
     device = torch.device('cuda' if use_cuda else 'cpu')
+    print('device:', device)
     model = LeNetConv().to(device) if conv_layers else LeNetFC().to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
     scheduler = StepLR(optimizer, step_size=1, gamma=gamma)

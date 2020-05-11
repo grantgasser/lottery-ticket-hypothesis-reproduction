@@ -19,6 +19,8 @@ def load_mnist(batch_size=64, test_batch_size=1000, no_cuda=False, rand_seed=42)
     """
     # logistics
     use_cuda = not no_cuda and torch.cuda.is_available()
+    print('cuda avail?:', torch.cuda.is_available())
+    print('use_cuda:', use_cuda)
     torch.manual_seed(rand_seed)
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
