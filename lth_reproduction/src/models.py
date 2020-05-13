@@ -13,6 +13,7 @@ class LeNetFC(nn.Module):
     """
     def __init__(self):
         super(LeNetFC, self).__init__()
+        # Fully connected (300-100-10 from LTH paper)
         self.fc1 = nn.Linear(784, 300)
         self.fc2 = nn.Linear(300, 100)
         self.fc3 = nn.Linear(100, 10)
@@ -20,7 +21,6 @@ class LeNetFC(nn.Module):
     def forward(self, x):
         x = torch.flatten(x, 1)
 
-        # Full connection
         x = self.fc1(x)
         x = F.relu(x)
         x = self.fc2(x)

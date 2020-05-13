@@ -1,13 +1,12 @@
-main.model = @LeNetFC()
-main.batch_size = 60
-main.test_batch_size = 1000
-main.epochs = 1
-main.lr = 1.2e-3
-main.gamma = 0.7
-main.no_cuda = False
-main.rand_seed = 42
-main.save_model = False
-main.conv_layers = True
+run.model = @LeNetFC()
+run.train_batch_size = 60
+run.val_batch_size = 1000
+run.epochs = 3
+run.lr = 1.2e-3
+run.gamma = 0.7
+run.no_cuda = False
+run.rand_seed = 42
+run.save_model = False
 
 
 # How many batches in between each terminal log
