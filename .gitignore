@@ -148,3 +148,6 @@ data/
 
 # ds
 *.DS_Store
+
+# logs
+tensorboard_logs/
