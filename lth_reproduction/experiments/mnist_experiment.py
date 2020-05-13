@@ -8,8 +8,8 @@ from torch import nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from ignite.engine import Events, create_supervised_trainer, create_supervised_evaluator
-from ignite.metrics import Accuracy, Loss
-from ignite.contrib.handlers.tensorboard_logger import *
+from ignite.metrics import Accuracy, Loss, RunningAverage
+from ignite.contrib.handlers import ProgressBar
 
 from models import LeNetFC, LeNetConv
 from train import train
@@ -27,6 +27,7 @@ def run(
         no_cuda=False,
         rand_seed=42,
         save_model=False,
+        display_gpu_info=False
         ):
     """
     This is the main script which trains and tests the model
@@ -53,63 +54,53 @@ def run(
     print('device:', device)
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    scheduler = StepLR(optimizer, step_size=1, gamma=gamma)
+    #scheduler = StepLR(optimizer, step_size=1, gamma=gamma)
     loss_fn = nn.CrossEntropyLoss()
 
-    # engines
+    # ignite engines
+    # following tutorial: https://github.com/pytorch/ignite/tree/master/examples/contrib/mnist
     trainer = create_supervised_trainer(model, optimizer, loss_fn, device=device)
-    metrics = {'Accuracy': Accuracy(), 'Loss': Loss(loss_fn)}
-    train_evaluator = create_supervised_evaluator(model, metrics=metrics, device=device)
-    val_evaluator = create_supervised_evaluator(model, metrics=metrics, device=device)
+    evaluator = create_supervised_evaluator(
+        model, metrics={'Accuracy': Accuracy(), 'Loss': Loss(loss_fn)}, device=device
+    )
 
-    # # run the training loop
-    # for epoch in range(1, epochs + 1):
-    #     train(model, device, train_loader, optimizer, epoch)
-    #
-    #     # here we use the test function for validation
-    #     test(model, loss_fn, val_loader, device)
-    #     scheduler.step()
-    #
-    # if save_model:
-    #     torch.save(model.state_dict(), "mnist_cnn.pt")
+    if display_gpu_info:
+        from ignite.contrib.metrics import GpuInfo
+
+        GpuInfo().attach(trainer, name="gpu")
+
+    pbar = ProgressBar(persist=True)
+    pbar.attach(trainer, metric_names="all")
 
     @trainer.on(Events.EPOCH_COMPLETED)
-    def compute_metrics(engine):
-        train_evaluator.run(train_loader)
-        val_evaluator.run(val_loader)
+    def log_training_results(engine):
+        evaluator.run(train_loader)
+        metrics = evaluator.state.metrics
+        avg_accuracy = metrics['Accuracy']
+        avg_loss = metrics['Loss']
+        pbar.log_message(
+            "Training Results - Epoch: {}  Avg accuracy: {:.2f}% Avg loss: {:.4f}".format(
+                engine.state.epoch, avg_accuracy*100, avg_loss
+            )
+        )
 
-    tb_logger = TensorboardLogger(log_dir='logs/tensorboard_logs')
+    @trainer.on(Events.EPOCH_COMPLETED)
+    def log_validation_results(engine):
+        evaluator.run(val_loader)
+        metrics = evaluator.state.metrics
+        avg_accuracy = metrics['Accuracy']
+        avg_loss = metrics['Loss']
+        pbar.log_message(
+            "Validation Results - Epoch: {}  Avg accuracy: {:.2f}% Avg loss: {:.4f}".format(
+                engine.state.epoch, avg_accuracy*100, avg_loss
+            )
+        )
 
-    tb_logger.attach(
-        trainer,
-        log_handler=OutputHandler(
-            tag="training", output_transform=lambda loss: {"batchloss": loss}, metric_names="all"
-        ),
-        event_name=Events.ITERATION_COMPLETED(every=100),
-    )
-
-    tb_logger.attach(
-        train_evaluator,
-        log_handler=OutputHandler(tag="training", metric_names=["Accuracy", "Loss"], another_engine=trainer),
-        event_name=Events.EPOCH_COMPLETED,
-    )
-
-    tb_logger.attach(
-        val_evaluator,
-        log_handler=OutputHandler(tag="validation", metric_names=["Accuracy", "Loss"], another_engine=trainer),
-        event_name=Events.EPOCH_COMPLETED,
-    )
+        pbar.n = pbar.last_print_n = 0
 
     trainer.run(train_loader, max_epochs=epochs)
-    tb_logger.close()
+
 
 if __name__ == '__main__':
     gin.parse_config_file('../config/mnist_config.gin')
-    # Setup engine logger
-    logger = logging.getLogger("ignite.engine.engine.Engine")
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
     run()

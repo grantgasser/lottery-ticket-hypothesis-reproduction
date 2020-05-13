@@ -7,6 +7,7 @@ run.gamma = 0.7
 run.no_cuda = False
 run.rand_seed = 42
 run.save_model = False
+run.display_gpu_info = False
 
 
 # How many batches in between each terminal log
