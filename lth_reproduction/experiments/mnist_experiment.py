@@ -16,7 +16,7 @@ def main(
         model=LeNetFC,
         batch_size=64,
         test_batch_size=1000,
-        epochs=5,
+        epochs=3,
         lr=1.0,
         gamma=0.7,
         no_cuda=False,

@@ -44,8 +44,7 @@ Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifyin
 * Intimidating: No
 
 ### Tools
-* [Paperspace GPUs](https://gradient.paperspace.com/free-gpu)
-* Try to use [PyTorch](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html) for pruning. If it doesn't work, implement ourselves. 
+* [Paperspace GPUs](https://gradient.paperspace.com/free-gpu). Currently we are using the ML-in-a-box instance.
 
 ### Reproduction Advice
 * Can't prune every layer equally, keep track of that stuff
@@ -69,21 +68,22 @@ Explanations of the parameters are in `experiments/mnist_experiment.py`.
 ### LeNet without convolutional layers
 Interestingly, the authors implemented a 300-100 LeNet architecture 
 without the convolutional layers, achieving performance around ~98%.  
-We were able to achieve these results on a validation set after 
-5 epochs of 60K iterations: `Accuracy: 9806/10000 (98.06%)`.
+We were able to achieve similar results on a validation set after 
+5 epochs of 60K iterations: `Accuracy: 9806/10000 (98.06%)`. We also reach
+`Accuracy: 9755/10000 (97.55%)` with just one epoch or 60K iterations. 
 
 ### Architecture and Parameters
 Some details on the architecture and hyperparameters:
 * MNIST Images: `[1, 28, 28]`
 * 3 Fully Connected Layers
-* Batch Size: `64`
+* Batch Size: `60`
 * Optimizer: Adam
 * Learning Rate: `1.2e-3`
 * [StepLR](https://pytorch.org/docs/stable/optim.html#torch.optim.lr_scheduler.StepLR) Scheduler (not sure what the authors used)
 
-### LeNet with original convolutional layers
+### LeNet with original convolutional layers (our addition)
 * Add 2 Convolutional Layers to the architecture with max pooling.
-* Results with convolutional architecture: `Accuracy: 9912/10000 (99.12%)`
+* Results with convolutional architecture after 5 epochs: `Accuracy: 9912/10000 (99.12%)`
 The output dimension of a convolutional layer can be calculated like so `O = (I - K + 2P)/S + 1`, where `I`: input dim,
 `K`: kernel size, `P`: padding, and `S`: stride. The output dimension of a
 pooling layer can be calculated like so `O = (I - P)/S + 1` where `P`: size of pooling kernel. The dimensions of
@@ -95,5 +95,13 @@ the data change in the following way: `[64, 1, 28, 28] => conv1 => [64, 6, 24, 2
 Adam with `lr=1.0` did not converge, though Adadelta with `lr=1.0` did converge. 
 Ultimately, we used Adam and `lr=1.2e-3.`
 
+
+## Figure 1 Reproduction (2nd milestone) [In Progress]
+* [ ] Refactor Train/Test using [Ignite](https://pytorch.org/ignite/)
+* [ ] Early Stopping
+* [ ] Implement iterative pruning on LeNetFC
+    - Similar to [re-implementation](https://github.com/google-research/lottery-ticket-hypothesis/blob/a032bd01c689823a208b8ca616d483187e1e471e/foundations/pruning.py#L24)
+    - May also try [pytorch pruning](https://github.com/facebookresearch/open_lth/tree/master/pruning)
+    - Or pruning from [OpenLTH](https://github.com/facebookresearch/open_lth/tree/master/pruning)
 
 
