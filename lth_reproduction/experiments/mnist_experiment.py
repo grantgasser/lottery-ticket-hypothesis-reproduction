@@ -8,16 +8,15 @@ from torch import nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from ignite.engine import Events, create_supervised_trainer, create_supervised_evaluator
-from ignite.metrics import Accuracy, Loss, RunningAverage
-from ignite.contrib.handlers import ProgressBar
+from ignite.metrics import Accuracy, Loss
+from ignite.contrib.handlers import ProgressBar, LRScheduler
+from ignite.handlers import ModelCheckpoint, EarlyStopping
 
 from models import LeNetFC, LeNetConv
-from train import train
-from evaluate import test
 from prepare_data import load_mnist
 
 @gin.configurable
-def run(
+def main(
         model=LeNetFC,
         train_batch_size=64,
         val_batch_size=1000,
@@ -54,15 +53,30 @@ def run(
     print('device:', device)
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    #scheduler = StepLR(optimizer, step_size=1, gamma=gamma)
+    scheduler = StepLR(optimizer, step_size=1, gamma=gamma)
     loss_fn = nn.CrossEntropyLoss()
 
     # ignite engines
     # following tutorial: https://github.com/pytorch/ignite/tree/master/examples/contrib/mnist
     trainer = create_supervised_trainer(model, optimizer, loss_fn, device=device)
-    evaluator = create_supervised_evaluator(
+    train_evaluator = create_supervised_evaluator(
         model, metrics={'Accuracy': Accuracy(), 'Loss': Loss(loss_fn)}, device=device
     )
+    val_evaluator = create_supervised_evaluator(
+        model, metrics={'Accuracy': Accuracy(), 'Loss': Loss(loss_fn)}, device=device
+    )
+
+    # add LR scheduler handler - doesn't converge!
+    # lr_handler = LRScheduler(scheduler)
+    # trainer.add_event_handler(Events.ITERATION_COMPLETED, lr_handler)
+
+    # add Early Stopping
+    # def score_function(engine):
+    #     val_loss = engine.state.metrics['Loss']
+    #     return val_loss
+
+    early_stopping_handler = EarlyStopping(patience=2, score_function=score_function, trainer=trainer)
+    val_evaluator.add_event_handler(Events.COMPLETED, early_stopping_handler)
 
     if display_gpu_info:
         from ignite.contrib.metrics import GpuInfo
@@ -74,8 +88,8 @@ def run(
 
     @trainer.on(Events.EPOCH_COMPLETED)
     def log_training_results(engine):
-        evaluator.run(train_loader)
-        metrics = evaluator.state.metrics
+        train_evaluator.run(train_loader)
+        metrics = train_evaluator.state.metrics
         avg_accuracy = metrics['Accuracy']
         avg_loss = metrics['Loss']
         pbar.log_message(
@@ -86,8 +100,8 @@ def run(
 
     @trainer.on(Events.EPOCH_COMPLETED)
     def log_validation_results(engine):
-        evaluator.run(val_loader)
-        metrics = evaluator.state.metrics
+        val_evaluator.run(val_loader)
+        metrics = val_evaluator.state.metrics
         avg_accuracy = metrics['Accuracy']
         avg_loss = metrics['Loss']
         pbar.log_message(
@@ -103,4 +117,4 @@ def run(
 
 if __name__ == '__main__':
     gin.parse_config_file('../config/mnist_config.gin')
-    run()
+    main()
