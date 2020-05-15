@@ -18,10 +18,11 @@ def train(model, device, train_loader, optimizer, epoch, batch_log_interval=10):
     """
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
+        #print('BATCH:', batch_idx)
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = model(data)
-        loss = F.nll_loss(output, target)
+        loss = model.loss(output, target)
         loss.backward()
         optimizer.step()
         if batch_idx % batch_log_interval == 0:

@@ -57,7 +57,7 @@ def main(
         train(model, device, train_loader, optimizer, epoch)
 
         # here we use the test function for validation
-        test(model, device, test_loader)
+        test_loss = test(model, device, test_loader)
         scheduler.step()
 
     if save_model:

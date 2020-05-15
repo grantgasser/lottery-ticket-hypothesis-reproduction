@@ -17,6 +17,8 @@ class LeNetFC(nn.Module):
         self.fc2 = nn.Linear(300, 100)
         self.fc3 = nn.Linear(100, 10)
 
+        self.loss = nn.CrossEntropyLoss()
+
     def forward(self, x):
         x = torch.flatten(x, 1)
 
@@ -47,6 +49,8 @@ class LeNetConv(nn.Module):
         self.fc1 = nn.Linear(16*4*4, 300)
         self.fc2 = nn.Linear(300, 100)
         self.fc3 = nn.Linear(100, 10)
+
+        self.loss = nn.CrossEntropyLoss()
 
     def forward(self, x):
     	# Convolutions
