@@ -1,7 +1,7 @@
 main.model = @LeNetFC()
 main.batch_size = 60
-main.test_batch_size = 1000
-main.epochs = 3
+main.test_batch_size = 64
+main.epochs = 20
 main.lr = 1.2e-3
 main.gamma = 0.7
 main.no_cuda = False
@@ -12,3 +12,5 @@ main.conv_layers = True
 
 # How many batches in between each terminal log
 train.batch_log_interval = 10
+train.val_size = 256  # must be divisible by val_batch_size
+train.val_batch_size = 64

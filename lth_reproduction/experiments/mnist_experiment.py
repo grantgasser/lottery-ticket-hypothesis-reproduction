@@ -54,11 +54,14 @@ def main(
 
     # run the training loop
     for epoch in range(1, epochs + 1):
-        train(model, device, train_loader, optimizer, epoch)
+        done = train(model, device, train_loader, test_loader, optimizer, epoch)
 
         # here we use the test function for validation
-        test_loss = test(model, device, test_loader)
+        test(model, device, test_loader)
         scheduler.step()
+
+        if done:
+            break
 
     if save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")
