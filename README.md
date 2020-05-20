@@ -6,8 +6,6 @@ This paper in a few words: 1) Train network 2) Prune unecessary weights/connecti
 
 ## Project Proposal
 
-### Cited Literature
-
 ### Follow Up Literature
 * [Sparse Transfer Learning](https://paperswithcode.com/paper/sparse-transfer-learning-via-winning-lottery) with [code](https://github.com/rahulsmehta/sparsity-experiments)
 * [Deconstructing Lottery Tickets - Uber](https://eng.uber.com/deconstructing-lottery-tickets/) with [code](https://github.com/uber-research/deconstructing-lottery-tickets)
@@ -50,6 +48,26 @@ Based on [this paper](https://papers.nips.cc/paper/8787-a-step-toward-quantifyin
 * Can't prune every layer equally, keep track of that stuff
 * Learning rate matters for the bigger models but not as much for the smaller models
 * Be careful using pytorch in-built pruning
+
+### More Advice For Reproduction (via Rahul Mehta)
+* By iteration j, they mean one batch right? 
+    - Yes. 
+* Do you know the details of early stopping? Min_delta? Patience? Min validation loss? And patience usually refers to epochs right? 
+    - Not sure. Seems arbitrary.
+* Is there a reason you didn't use pytorch pruning and implemented it yourself?
+    - Wasn't available at the time
+* Separate train function for each epoch? So you can do per-batch and check early stop?
+* If p = 20%, is that 20% globally? How do you prune layer-wise?  
+    - Pruning rates specified in paper, different from % of weights remaining
+* By test accuracy, are they referring to validation accuracy? 
+    - No, actually test accuracy.
+* Tips:
+    - Train/Valid/Test split 
+    - Don't prune biases 
+    - When early stopping **would have** occured, don't actually stop though
+    - Follow data augmentation steps in paper (pixel pads and crops)
+    - Lottery ticket sensitive to batch size
+
 
 ### Tentative Proposed Timeline (w/ weekly milestone)
 * [X] Week 1: Reproduce MNIST ~98% in PyTorch
@@ -97,8 +115,8 @@ Ultimately, we used Adam and `lr=1.2e-3.`
 
 
 ## Figure 1 Reproduction (2nd milestone) [In Progress]
-* [ ] Refactor Train/Test using [Ignite](https://pytorch.org/ignite/)
-* [ ] Early Stopping
+* [Might skip] Refactor Train/Test using [Ignite](https://pytorch.org/ignite/)
+* [X] Early Stopping
 * [ ] Implement iterative pruning on LeNetFC
     - Similar to [re-implementation](https://github.com/google-research/lottery-ticket-hypothesis/blob/a032bd01c689823a208b8ca616d483187e1e471e/foundations/pruning.py#L24)
     - May also try [pytorch pruning](https://github.com/facebookresearch/open_lth/tree/master/pruning)

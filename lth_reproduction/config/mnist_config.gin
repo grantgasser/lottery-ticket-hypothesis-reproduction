@@ -12,5 +12,5 @@ main.conv_layers = True
 
 # How many batches in between each terminal log
 train.batch_log_interval = 10
-train.val_size = 256  # must be divisible by val_batch_size
-train.val_batch_size = 64
+train.patience = 20
+train.min_delta = 0.1  # set back to .003 for experiments

@@ -1,8 +1,10 @@
 import torch
+from torch.utils.data import SubsetRandomSampler
 from torchvision import datasets, transforms
+import numpy as np
 
 
-def load_mnist(batch_size=64, test_batch_size=1000, no_cuda=False, rand_seed=42):
+def load_mnist(batch_size=64, valid_size=500, no_cuda=False, rand_seed=42, shuffle=True):
     """
     Loads mnist dataset from Torch and stores for training and testing.
 
@@ -24,19 +26,47 @@ def load_mnist(batch_size=64, test_batch_size=1000, no_cuda=False, rand_seed=42)
     torch.manual_seed(rand_seed)
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
-    # load train and test data
-    train_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('../data', train=True, download=True,
-                       transform=transforms.Compose([
-                           transforms.ToTensor(),
-                           transforms.Normalize((0.1307,), (0.3081,))
-                       ])),
-        batch_size=batch_size, shuffle=True, **kwargs)
-    test_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('../data', train=False, transform=transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))
-        ])),
-        batch_size=test_batch_size, shuffle=True, **kwargs)
+    # load train/valid data
+    tfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+    train_data = datasets.MNIST(
+        root='../data', train=True,
+        download=True, transform=tfm
+    )
 
-    return train_loader, test_loader, use_cuda
+    val_data = datasets.MNIST(
+        root='../data', train=True,
+        download=True, transform=tfm
+    )
+
+    num_train = len(train_data)
+    indices = list(range(num_train))
+    valid_size = 500
+
+    if shuffle:
+        np.random.seed(rand_seed)
+        np.random.shuffle(indices)
+
+    train_idx, valid_idx = indices[valid_size:], indices[:valid_size]
+    train_sampler = SubsetRandomSampler(train_idx)
+    val_sampler = SubsetRandomSampler(valid_idx)
+
+    train_loader = torch.utils.data.DataLoader(
+        train_data, batch_size=batch_size,
+        sampler=train_sampler, **kwargs
+    )
+    val_loader = torch.utils.data.DataLoader(
+        val_data, batch_size=batch_size,
+        sampler=val_sampler, **kwargs
+    )
+
+    # load test data
+    test_data = datasets.MNIST(
+        root='../data', train=False,
+        download=True, transform=tfm
+    )
+    test_loader = torch.utils.data.DataLoader(
+        test_data, batch_size=batch_size,
+        shuffle=True, **kwargs
+    )
+
+    return train_loader, val_loader, test_loader, use_cuda
