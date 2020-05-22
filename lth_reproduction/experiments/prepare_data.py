@@ -18,6 +18,8 @@ def load_mnist(batch_size=64, valid_size=500, no_cuda=False, rand_seed=42, shuff
         train_loader (torch.utils.data.DataLoader): object containing training data
         test_loader (torch.utils.data.DataLoader): object containing test data
         use_cuda (bool): whether to use cuda
+
+    TODO: change validation set to be 5000 of the original 60000 train samples (thus leaving 55000 train samples)
     """
     # logistics
     use_cuda = not no_cuda and torch.cuda.is_available()

@@ -65,14 +65,14 @@ def train(
 
         # trigger early stopping
         if no_improvement_count == patience:
-            print('Early Stopping Triggered. Done Training. val_loss = {:.6f}, prev_val_loss = {:.6f}'.format(val_loss, prev_val_loss))
+            print('Early Stopping Triggered at iteration {} within epoch. Done Training. val_loss = {:.6f}, prev_val_loss = {:.6f}'.format(batch_idx, val_loss, prev_val_loss))
             test(model, device, test_loader)
             stop = True
-            break
+            return stop, batch_idx
 
         if batch_idx % batch_log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tTrain Loss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
 
-    return stop
+    return stop, None

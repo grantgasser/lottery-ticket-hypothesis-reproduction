@@ -12,7 +12,7 @@ from models import LeNetFC, LeNetConv
 from train import train
 from evaluate import test
 from prepare_data import load_mnist
-from pruning import BasePruning
+from pruning import Model
 
 @gin.configurable
 def main(
@@ -47,7 +47,7 @@ def main(
 
     # load data
     train_loader, val_loader, test_loader, use_cuda = load_mnist(batch_size, test_batch_size, no_cuda, rand_seed)
-
+    print(len(train_loader.dataset))
     # setup device, model, optimizer, and lr scheduler
     device = torch.device('cuda' if use_cuda else 'cpu')
     print('device:', device)
@@ -62,30 +62,21 @@ def main(
 
     # run the training loop
     for epoch in range(1, epochs + 1):
-        stop = train(model, device, train_loader, val_loader, test_loader, optimizer, epoch)
+        stop, stopping_iteration = train(model, device, train_loader, val_loader, test_loader, optimizer, epoch)
 
         # test after each epoch
-        test(model, device, test_loader)
         scheduler.step()
 
         if stop:
+            print('Stopped at overall iteration {}\n'.format(stopping_iteration+ ((len(train_loader.dataset)/batch_size) * (epoch-1))))
             break
 
     if save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")
 
-    # pytorch prune
-    print('Pruning model randomly...')
-    pruning_rate = 0.2
-    for idx, (name, module) in enumerate(model.named_modules()):
-        if isinstance(module, torch.nn.Linear):
-            print('pruning', name)
-            prune.random_unstructured(module, name='weight', amount=pruning_rate)
-            prune.remove(module, 'weight')
-            print(module.weight[:2, :10])
-
-            print(np.count_nonzero(module.weight.detach().numpy())/(module.weight.shape[0] * module.weight.shape[1]))
-
+    print('\nPruning...\n')
+    prune_model = Model(model)
+    prune_model.prune()
 
     # now predict w/ pruned network
     test(model, device, test_loader)
