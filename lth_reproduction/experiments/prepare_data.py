@@ -72,3 +72,61 @@ def load_mnist(batch_size=64, valid_size=500, no_cuda=False, rand_seed=42, shuff
     )
 
     return train_loader, val_loader, test_loader, use_cuda
+
+
+def load_cifar10(batch_size=64, train_size=20000, valid_size=500, no_cuda=False, rand_seed=42, shuffle=True):
+    """
+    Loads cifar10 dataset from Torch and stores for training and testing.
+
+    Args:
+        batch_size (int): size of training mini-batch
+        test_batch_size (int): size of testing batch
+        no_cuda (bool): whether to use cuda or not
+        rand_seed (int): random seed
+
+    Returns:
+        train_loader (torch.utils.data.DataLoader): object containing training data
+        test_loader (torch.utils.data.DataLoader): object containing test data
+        use_cuda (bool): whether to use cuda
+        
+    """
+    # logistics
+    use_cuda = not no_cuda and torch.cuda.is_available()
+    print('cuda avail?:', torch.cuda.is_available())
+    print('use_cuda:', use_cuda)
+    torch.manual_seed(rand_seed)
+    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+
+    # load train/valid data
+    transform = transforms.Compose(
+        [transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+    train_data = datasets.CIFAR10(root='./data', train=True,
+                                            download=True, transform=transform)
+
+    test_data = datasets.CIFAR10(root='./data', train=False,
+                                           download=True, transform=transform)
+
+    classes = ('plane', 'car', 'bird', 'cat',
+               'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+
+    train_data_split = torch.utils.data.random_split(train_data, [train_size, len(train_data)-train_size])[0]
+    val_data_split = torch.utils.data.random_split(train_data, [valid_size, len(train_data)-valid_size])[0]
+
+    train_loader = torch.utils.data.DataLoader(
+        train_data_split, batch_size=batch_size,
+        shuffle=shuffle, **kwargs
+    )
+
+    val_loader = torch.utils.data.DataLoader(
+        val_data_split, batch_size=batch_size,
+        shuffle=shuffle, **kwargs
+    )
+
+    test_loader = torch.utils.data.DataLoader(
+        test_data, batch_size=batch_size,
+        shuffle=False, **kwargs
+    )
+
+    return train_loader, val_loader, test_loader, use_cuda
