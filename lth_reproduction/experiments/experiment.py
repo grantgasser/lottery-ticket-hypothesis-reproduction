@@ -78,9 +78,9 @@ def main(
     if save_model:
         torch.save(model.state_dict(), model.__class__.__name__ + '_' + dataset + ".pt")
 
-    print('\nPruning...\n')
-    prune_model = Model(model)
-    prune_model.prune()
+    # print('\nPruning...\n')
+    # prune_model = Model(model)
+    # prune_model.prune()
 
     # now predict w/ pruned network
     test(model, device, test_loader)

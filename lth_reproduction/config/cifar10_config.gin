@@ -1,4 +1,5 @@
 main.model = @Conv2()
+main.dataset = 'cifar10'
 main.batch_size = 60
 main.train_size = 20000
 main.test_batch_size = 64
