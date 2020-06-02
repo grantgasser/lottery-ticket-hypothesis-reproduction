@@ -12,7 +12,7 @@ from models import LeNetFC, LeNetConv, Conv2
 from train import train
 from evaluate import test
 from prepare_data import load_mnist, load_cifar10
-from pruning import Model
+from pruning import PruneModel
 
 @gin.configurable
 def main(
@@ -35,7 +35,7 @@ def main(
         model (torch.nn.Module): which model to use for the experiment
         dataset (str): which dataset to use for the experiment
         batch_size (int): size of training mini-batch
-        train_size (int):
+        train_size (int): size of train set, not necessary to specify with 'mnist'
         test_batch_size (int): size of testing batch
         epochs (int): num epochs
         lr (float): learning rate
@@ -68,22 +68,27 @@ def main(
     for epoch in range(1, epochs + 1):
         stop, stopping_iteration = train(model, device, train_loader, val_loader, test_loader, optimizer, epoch)
 
-        # test after each epoch
         scheduler.step()
+
+        # test after each epoch
+        test(model, device, test_loader)
 
         if stop:
             print('Stopped at overall iteration {}\n'.format(stopping_iteration + ((len(train_loader.dataset)/batch_size) * (epoch-1))))
             break
 
+
     if save_model:
         torch.save(model.state_dict(), model.__class__.__name__ + '_' + dataset + ".pt")
 
-    # print('\nPruning...\n')
-    # prune_model = Model(model)
-    # prune_model.prune()
+    print('\nPruning...\n')
+    prune_model = PruneModel(
+        model, batch_size, train_loader, val_loader, test_loader, optimizer, epochs, scheduler, device, pruning_rounds=7
+    )
+    prune_model.prune()
 
-    # now predict w/ pruned network
-    test(model, device, test_loader)
+    # # now predict w/ pruned network
+    # test(model, device, test_loader)
 
 
 if __name__ == '__main__':

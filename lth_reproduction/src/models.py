@@ -17,6 +17,11 @@ class LeNetFC(nn.Module):
         self.fc2 = nn.Linear(300, 100)
         self.fc3 = nn.Linear(100, 10)
 
+        # Gaussian Glorot init
+        for name, param in self.named_parameters():
+            if 'weight' in name:
+                torch.nn.init.xavier_uniform_(param)
+
         self.loss = nn.CrossEntropyLoss()
 
     def forward(self, x):
@@ -38,6 +43,8 @@ class LeNetConv(nn.Module):
     LeNet Convolutional Architecture
 
     # input: torch.Size([64, 1, 28, 28])
+
+    # IGNORE
     """
     def __init__(self):
         super(LeNetConv, self).__init__()
@@ -78,6 +85,8 @@ class Conv2(nn.Module):
     Conv-2 Architecture
 
     # input: torch.Size([batch, 3, 32, 32])
+
+    # todo: Gaussian glorot init for layers that will be pruned
     """
     def __init__(self):
         super(Conv2, self).__init__()

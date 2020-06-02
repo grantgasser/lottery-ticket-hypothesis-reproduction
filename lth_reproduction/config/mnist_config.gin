@@ -13,4 +13,4 @@ main.save_model = False
 train.batch_log_interval = 10
 #train.evaluation_freq = 10  # 100 in paper
 train.patience = 20
-train.min_delta = 0.1   # may need to set lower
+train.min_delta = 0.015

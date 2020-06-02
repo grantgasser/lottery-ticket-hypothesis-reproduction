@@ -39,6 +39,7 @@ def train(
     print('min_delta:', min_delta)
     no_improvement_count = 0
     stop = False
+    print('IN TRAIN, DEVICE:', device)
 
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
