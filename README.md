@@ -99,27 +99,49 @@ Some details on the architecture and hyperparameters:
 * Learning Rate: `1.2e-3`
 * [StepLR](https://pytorch.org/docs/stable/optim.html#torch.optim.lr_scheduler.StepLR) Scheduler (not sure what the authors used)
 
-### LeNet with original convolutional layers (our addition)
-* Add 2 Convolutional Layers to the architecture with max pooling.
-* Results with convolutional architecture after 5 epochs: `Accuracy: 9912/10000 (99.12%)`
-The output dimension of a convolutional layer can be calculated like so `O = (I - K + 2P)/S + 1`, where `I`: input dim,
-`K`: kernel size, `P`: padding, and `S`: stride. The output dimension of a
-pooling layer can be calculated like so `O = (I - P)/S + 1` where `P`: size of pooling kernel. The dimensions of
-the data change in the following way: `[64, 1, 28, 28] => conv1 => [64, 6, 24, 24] => maxPool => [64, 6, 12, 12]
-=> conv2 => [64, 6, 8, 8] => maxPool => [64, 6, 4, 4] => flatten => [64, 256] => fc1 => [64, 300] => fc2 => [64, 100]
-=> fc3 => [64, 10]`
-
 #### Interesting Note on Optimization
 Adam with `lr=1.0` did not converge, though Adadelta with `lr=1.0` did converge. 
 Ultimately, we used Adam and `lr=1.2e-3.`
 
 
-## Figure 1 Reproduction (2nd milestone) [In Progress]
+## Figure 1 and 2 Reproduction (2nd milestone) [In Progress]
 * [Might skip] Refactor Train/Test using [Ignite](https://pytorch.org/ignite/)
 * [X] Early Stopping
-* [ ] Implement iterative pruning on LeNetFC
+* [X] Implement iterative pruning on LeNetFC
     - Similar to [re-implementation](https://github.com/google-research/lottery-ticket-hypothesis/blob/a032bd01c689823a208b8ca616d483187e1e471e/foundations/pruning.py#L24)
     - May also try [pytorch pruning](https://github.com/facebookresearch/open_lth/tree/master/pruning)
     - Or pruning from [OpenLTH](https://github.com/facebookresearch/open_lth/tree/master/pruning)
 
+## Tips and Tricks
+* Lenet model is without Conv layers, just (300-100-10 linear layers)
+* Read the appendix for specifics on experiments
+* Avoid `prune` module in torch
+    - good for one-shot pruning, not iterative pruning
+* Iterative pruning rate:
+    - e.g. if paper says 7 rounds of pruning and fc20% (.002)
+    - that means: (.002)^(1/7) = .41, so prune 41% of the remaining weights at each step
+        0. 100% ((.002)^(1/7))^0
+        1. 41.1% ((.002)^(1/7))^1
+        2. 16.9% ((.002)^(1/7))^2
+        3. 7.0% ((.002)^(1/7))^3
+        4. 2.9% ((.002)^(1/7))^4
+        5. 1.2% ((.002)^(1/7))^5
+        6. 0.5% ((.002)^(1/7))^6
+        7. 0.2% ((.002)^(1/7))^7
+        
 
+## Reproducibility Report 
+Our reproducibility efforts are ongoing. Setting up models was easy with torch.
+The most difficult part is the implementation of iterative pruning.
+We tried used torch's `prune` module, which looked very appealing 
+and simple but only worked well for one-shot pruning and failed for iterative pruning.
+
+### Current State
+Iterative pruning is working in terms of how many weights are being pruned
+at each step and re-initializing to the weights of the original network. Despite this,
+test accuracy goes down significantly the more we prune. This may be because
+we are still have early stopping implemented (as opposed to just recording
+when it would have happened) or possibly because out validation data
+is a subset of our train data. This is due to to the fact that torch splits
+MNIST into train (60K) and test (10K) without a validation set. So those are two
+things to try first when debugging this.
